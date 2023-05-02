@@ -1,6 +1,3 @@
-# remember try and catch
-# remember do while
-# 4 points after the dot at print
 
 from sys import argv
 
