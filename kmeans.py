@@ -1,6 +1,4 @@
-
 from sys import argv
-
 
 def compute_distance(dot1, dot2):  # dot1 and dot2 are arrays
     coordinates_square = []
@@ -19,8 +17,6 @@ def compute_distance(dot1, dot2):  # dot1 and dot2 are arrays
   gets dot and centroid list, adds the dot to the right cluster, returns None
   !! the list old_centroids is a list of tuples -> (centroid_0, cluster_0 array), where the cluster arrays are empty
 """
-
-
 def add_to_cluster(dot: list, old_centroids: list):
     curr_min = float('inf')
     chosen_centroid = None
@@ -35,15 +31,14 @@ def add_to_cluster(dot: list, old_centroids: list):
     return None
 
 
-def check_delta_cenroids(old_centroids, new_centroids):  # returns true if delta smaller than epsilon
+def check_delta_cenroids(old_centroids: list, new_centroids: list):  # returns true if delta smaller than epsilon
     for i in range(0, len(old_centroids)):  # CAN CHANGE TO K
         if compute_distance(new_centroids[i][0], old_centroids[i][0]) > 0.001:
             return False
-
     return True
 
 
-def compute_centroid(cluster_array):
+def compute_centroid(cluster_array: list):
     new_centroid = []
     for d in range(D):
         total = 0
@@ -67,8 +62,6 @@ dots_arr = []
 # reading line by line (dot by dot)
 line = data_file.readline()
 while line != "":
-    # print("the line is: " + line)
-    # print(line.split(","))
     dots_arr.append([float(x) for x in line.split(",")])
     line = data_file.readline()
     N += 1
@@ -77,41 +70,42 @@ D = len(dots_arr[0])  # the dimension of the dots
 
 # check inputs
 K = int(argv[1])
+valid_input = True
 if K <= 1 or K >= N:
-    raise Exception("Invalid number of clusters!")
+    print("Invalid number of clusters!")
+    valid_input = False
 if iter_num <= 1 or iter_num >= 1000 or iter_num >= N:
-    raise Exception("Invalid maximum iteration")
+    print("Invalid maximum iteration!")
+    valid_input = False
 
 # main
-try:
-    old_centroids = []
-    for i in range(K):
-        old_centroids.append((dots_arr[i], []))
-    counter = 0
-    while True:
-        new_centroids = []
-        counter += 1
-        # check if we finished the iteration
-        if counter == iter_num:
-            break
-        # assign every dot to the closest cluster
-        for i in range(N):
-            add_to_cluster(dots_arr[i], old_centroids)
-        # update the centroid
+if valid_input:
+    try:
+        old_centroids = []
         for i in range(K):
-            new_centroids.append((compute_centroid(old_centroids[i][1]), []))
-
-        # if delta of all the dots smaller than epsilon
-        if check_delta_cenroids(old_centroids, new_centroids):
-            break
-
-        # update old centroids array
-        temp = old_centroids
-        old_centroids = new_centroids
-        del temp
-
-    # printing the K centroids
-    for k in range(K):
-        print(",".join(["%.4f" % old_centroids[k][0][d] for d in range(D)]))
-except:
-    print("An Error Has Occurred")
+            old_centroids.append((dots_arr[i], []))
+        counter = 0
+        while True:
+            new_centroids = []
+            counter += 1
+            # check if we finished the iteration
+            if counter == iter_num:
+                break
+            # assign every dot to the closest cluster
+            for i in range(N):
+                add_to_cluster(dots_arr[i], old_centroids)
+            # update the centroid
+            for i in range(K):
+                new_centroids.append((compute_centroid(old_centroids[i][1]), []))
+            # if delta of all the dots smaller than epsilon
+            if check_delta_cenroids(old_centroids, new_centroids):
+                break
+            # update old centroids array
+            temp = old_centroids
+            old_centroids = new_centroids
+            del temp
+        # printing the K centroids
+        for k in range(K):
+            print(",".join(["%.4f" % old_centroids[k][0][d] for d in range(D)]))
+    except:
+        print("An Error Has Occurred")
