@@ -48,13 +48,6 @@ def compute_centroid(cluster_array: list):
     return new_centroid
 
 
-EPSILON = 0.001
-# iter value
-iter_num = 200  # the default value
-# the new value if one was entered
-if len(argv) > 3:
-    iter_num = int(argv[2])
-
 # reading the file, compute N and the array of the dots
 data_file = open(argv[-1], "r")
 N = 0
@@ -68,15 +61,37 @@ while line != "":
 data_file.close()
 D = len(dots_arr[0])  # the dimension of the dots
 
+EPSILON = 0.001
 # check inputs
-K = int(argv[1])
 valid_input = True
-if K <= 1 or K >= N:
+# check K
+# check if iter is integer
+try:
+    K = int(argv[1])
+    # check k in in the range
+    if K <= 1 or K >= N:
+        print("Invalid number of clusters!")
+        valid_input = False
+except ValueError:
     print("Invalid number of clusters!")
     valid_input = False
-if iter_num <= 1 or iter_num >= 1000 or iter_num >= N:
-    print("Invalid maximum iteration!")
-    valid_input = False
+
+# iter default value value
+iter_num = 200
+# the new value if one was entered
+int_inter = True
+if len(argv) > 3:
+    # check if iter is integer
+    try:
+        iter_num = int(argv[2])
+        # check if the iter in the range
+        if iter_num <= 1 or iter_num >= 1000 or iter_num >= N:
+            print("Invalid maximum iteration!")
+            valid_input = False
+    except ValueError:
+        print("Invalid maximum iteration!")
+        valid_input = False
+
 
 # main
 if valid_input:
