@@ -92,7 +92,6 @@ if len(argv) > 3:
         print("Invalid maximum iteration!")
         valid_input = False
 
-
 # main
 if valid_input:
     try:
@@ -102,10 +101,10 @@ if valid_input:
         counter = 0
         while True:
             new_centroids = []
-            counter += 1
             # check if we finished the iteration
             if counter == iter_num:
                 break
+            counter += 1
             # assign every dot to the closest cluster
             for i in range(N):
                 add_to_cluster(dots_arr[i], old_centroids)
