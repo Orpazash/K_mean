@@ -19,8 +19,6 @@ def compute_distance(dot1, dot2):  # dot1 and dot2 are arrays
   gets dot and centroid list, adds the dot to the right cluster, returns None
   !! the list old_centroids is a list of tuples -> (centroid_0, cluster_0 array), where the cluster arrays are empty
 """
-
-
 def add_to_cluster(dot: list, old_centroids: list):
     curr_min = float('inf')
     chosen_centroid = None
@@ -109,7 +107,6 @@ if inputs[2]:
             # check if we finished the iteration
             if counter == iter_num:
                 break
-            counter += 1
             # assign every dot to the closest cluster
             for i in range(N):
                 add_to_cluster(dots_arr[i], old_centroids)
@@ -123,6 +120,7 @@ if inputs[2]:
             temp = old_centroids
             old_centroids = new_centroids
             del temp
+            counter += 1
         # printing the K centroids
         for k in range(K):
             print(",".join(["%.4f" % old_centroids[k][0][d] for d in range(D)]))
