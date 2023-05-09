@@ -1,5 +1,7 @@
 from sys import argv
 
+EPSILON = 0.001
+
 def compute_distance(dot1, dot2):  # dot1 and dot2 are arrays
     coordinates_square = []
     summ = 0
@@ -30,10 +32,9 @@ def add_to_cluster(dot: list, old_centroids: list):
     chosen_centroid[1].append(dot)
     return None
 
-
 def check_delta_cenroids(old_centroids: list, new_centroids: list):  # returns true if delta smaller than epsilon
     for i in range(0, len(old_centroids)):  # CAN CHANGE TO K
-        if compute_distance(new_centroids[i][0], old_centroids[i][0]) > 0.001:
+        if compute_distance(new_centroids[i][0], old_centroids[i][0]) > EPSILON:
             return False
     return True
 
@@ -48,52 +49,48 @@ def compute_centroid(cluster_array: list):
     return new_centroid
 
 
-# reading the file, compute N and the array of the dots
-data_file = open(argv[-1], "r")
-N = 0
-dots_arr = []
-# reading line by line (dot by dot)
-line = data_file.readline()
-while line != "":
-    dots_arr.append([float(x) for x in line.split(",")])
+def read_file(N: int, dots_arr: list):
+    # reading the file, compute N and the array of the dots
+    data_file = open(argv[-1], "r")
+    # reading line by line (dot by dot)
     line = data_file.readline()
-    N += 1
-data_file.close()
-D = len(dots_arr[0])  # the dimension of the dots
+    while line != "":
+        dots_arr.append([float(x) for x in line.split(",")])
+        line = data_file.readline()
+        N += 1
+    data_file.close()
+    return N
 
-EPSILON = 0.001
-# check inputs
-valid_input = True
-# check K
-# check if iter is integer
-try:
-    K = int(argv[1])
-    # check k in in the range
+
+def check_inputs(K, iter_num):
+    valid_input = True
+
+    # check if K  or not in the range
     if K <= 1 or K >= N:
         print("Invalid number of clusters!")
         valid_input = False
-except ValueError:
-    print("Invalid number of clusters!")
-    valid_input = False
 
-# iter default value value
-iter_num = 200
-# the new value if one was entered
-int_inter = True
-if len(argv) > 3:
-    # check if iter is integer
-    try:
-        iter_num = int(argv[2])
-        # check if the iter in the range
-        if iter_num <= 1 or iter_num >= 1000 or iter_num >= N:
-            print("Invalid maximum iteration!")
-            valid_input = False
-    except ValueError:
+    # check if iter is not in the range
+    if iter_num <= 1 or iter_num >= 1000:
         print("Invalid maximum iteration!")
         valid_input = False
 
-# main
-if valid_input:
+    return valid_input
+
+
+# save inputs
+dots_arr = []
+N = read_file(0, dots_arr)
+D = len(dots_arr[0])  # the dimension of the dots
+# according to the forum we can assume the inputs are of type int
+K = int(argv[1])
+iter_num = 200  # iter default value
+if len(argv) > 3:
+    iter_num = int(argv[2])
+
+# only if the input is valid we continue
+if check_inputs(K, iter_num):
+    # noinspection PyBroadException
     try:
         old_centroids = []
         for i in range(K):
@@ -104,7 +101,6 @@ if valid_input:
             # check if we finished the iteration
             if counter == iter_num:
                 break
-            counter += 1
             # assign every dot to the closest cluster
             for i in range(N):
                 add_to_cluster(dots_arr[i], old_centroids)
@@ -118,6 +114,7 @@ if valid_input:
             temp = old_centroids
             old_centroids = new_centroids
             del temp
+            counter += 1
         # printing the K centroids
         for k in range(K):
             print(",".join(["%.4f" % old_centroids[k][0][d] for d in range(D)]))
