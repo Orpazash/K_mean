@@ -62,10 +62,11 @@ def read_file(N: int, dots_arr: list):
     return N
 
 
+
 def check_inputs(K, iter_num):
     valid_input = True
 
-    # check if K  or not in the range
+    # check if K or not in the range
     if K <= 1 or K >= N:
         print("Invalid number of clusters!")
         valid_input = False
