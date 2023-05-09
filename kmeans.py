@@ -62,40 +62,35 @@ def read_file(N: int, dots_arr: list):
     return N
 
 
-def check_inputs():
+
+def check_inputs(K, iter_num):
     valid_input = True
-    # check K
-    K = 0
-    # check if K is not integer or not in the range
-    if not argv[1].isnumeric() or int(argv[1]) <= 1 or int(argv[1]) >= N:
+
+    # check if K or not in the range
+    if K <= 1 or K >= N:
         print("Invalid number of clusters!")
         valid_input = False
-    else:
-        K = int(argv[1])
 
-    # iter default value
-    iter_num = 200
-    # the new value if one was entered
-    if len(argv) > 3:
-        # check if iter is not integer or not in the range
-        if not argv[2].isnumeric() or int(argv[2]) <= 1 or int(argv[2]) >= 1000:
-            print("Invalid maximum iteration!")
-            valid_input = False
-        else:
-            iter_num = int(argv[2])
-    return K, iter_num, valid_input
+    # check if iter is not in the range
+    if iter_num <= 1 or iter_num >= 1000:
+        print("Invalid maximum iteration!")
+        valid_input = False
+
+    return valid_input
 
 
 # save inputs
 dots_arr = []
 N = read_file(0, dots_arr)
 D = len(dots_arr[0])  # the dimension of the dots
-inputs = check_inputs()
-K = inputs[0]
-iter_num = inputs[1]
+# according to the forum we can assume the inputs are of type int
+K = int(argv[1])
+iter_num = 200  # iter default value
+if len(argv) > 3:
+    iter_num = int(argv[2])
 
 # only if the input is valid we continue
-if inputs[2]:
+if check_inputs(K, iter_num):
     # noinspection PyBroadException
     try:
         old_centroids = []
