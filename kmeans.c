@@ -8,16 +8,29 @@ struct cluster
 {
     double *centroid;
     double **datapoints;
+    struct cluster *next;
 };
 
 
-int readFile(){
+int readFile(FILE *f){
     int N = 0;
-    // Read the content and print it
-    /* while(fgets(myString, 100, fptr)) {
-        N += 1
+    double num;
+    while (fscanf(f,"%f",&num)!= EOF){
+        char c;
+        if((c = fgetc(f))!=EOF){
+            //same point
+             if(c== ","){
+
+             }
+             //moving to the next point
+             else if(c = "\n"){
+                
+                N+=1;
+             }
+        }
+        else
+            break;
     }
-    */
     return N;
 }
 
@@ -43,7 +56,10 @@ int main(int argc, char **argv)
 {
     //read the file
     FILE *fileP;
-    fileP = fopen(argv[3],"r");
+    if(argc==3)
+        fileP = fopen(argv[2],"r");
+    else
+        fileP = fopen(argv[3],"r");
     int N = readFile(fileP);
     fclose(fileP);
 
@@ -56,7 +72,7 @@ int main(int argc, char **argv)
 
     // if the inputs are valid 
     if(checkInput(K,iter,N)){
-
+        //enter the code
     }
     return 0;
 }
