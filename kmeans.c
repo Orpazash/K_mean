@@ -16,10 +16,16 @@ struct vector
     struct cord *cords;
 };
 
+typedef struct cluster_item_s
+{
+    struct vector *vector_item;
+    struct cluster_item_s *next;
+} cluster_item;
+
 struct cluster
 {
     struct vector *centroid;
-    struct vector *vector_list;
+    cluster_item * first_item;
     struct cluster *next;
 };
 
@@ -81,6 +87,64 @@ int checkInput(int K, int iter, int N){
 
     return valid_input;
 }
+ //struct cord *cord1;
+ //struct vector vec1;
+
+ 
+double coumpute_vector_distance(struct vector *vector1, struct vector *vector2)
+{
+    double sum;
+    struct cord *curr_cord1,*curr_cord2;  //creating curr cordinates from vectors
+    curr_cord1 = vector1->cords;
+    curr_cord2 = vector2->cords;
+
+    double cord1_data = curr_cord1->value;  //extracting values of first cords and adding to sum 
+    double cord2_data = curr_cord2->value;
+    sum += pow(cord1_data - cord2_data, 2);
+
+    while (curr_cord1->next != NULL) // going over all d cordinates
+    {
+        curr_cord1 = curr_cord1->next; // going to the next coordinate in both vectors
+        curr_cord2 = curr_cord2->next;
+
+        double cord1_data = curr_cord1->value;  //extracting values of cords 
+        double cord2_data = curr_cord2->value;
+
+        sum += pow(cord1_data - cord2_data, 2);
+
+    }
+
+    return sqrt(sum);
+}
+
+void add_to_cluster(struct vector *vec, struct cluster *curr_cluster, int N)  //adds vector to the right cluster
+{
+    struct cluster *min_cluster;
+    double min_dist = 10000.0;  //NEED TO CHANGE TO ACTUAL MAX
+    while(curr_cluster->next != NULL)
+    {
+        double curr_dist = coumpute_vector_distance((curr_cluster->centroid), vec);
+        if (curr_dist < min_dist)
+        {
+            min_cluster = curr_cluster;
+            min_dist = curr_dist;
+        }
+    }
+    cluster_item * cluster_item = malloc(sizeof(cluster_item));
+    cluster_item->vector_item = vec;
+    //now add vector to vector list of the min cluster
+    if (NULL == min_cluster->first_item) {
+        min_cluster->first_item = cluster_item;
+        return;
+    }
+    
+    if (NULL != min_cluster->first_item->next) {
+        cluster_item->next = min_cluster->first_item->next;
+    }
+    min_cluster->first_item->next = cluster_item;
+}
+
+
 
 void print_cords(struct cord *head, int d)
 {
@@ -101,6 +165,15 @@ void print_vector(struct vector *head, int n, int d)
     printf("\n");
 }
 
+void print_cluster(struct cluster *head, int n, int d)
+{
+    cluster_item *vec_in_cluster = head->first_item;
+    while (NULL != vec_in_cluster) {
+        print_vector(vec_in_cluster->vector_item, n , d);
+        vec_in_cluster = vec_in_cluster->next;
+    }
+}
+
 
 int main(int argc, char **argv){
     int D = 0;
@@ -119,7 +192,6 @@ int main(int argc, char **argv){
     printf("%d\n", D);
     printf("%d\n", N);
     print_vector(head_vec, N, D);
-    scanf("%s", file_name);
 
     // get and check inputs
     int K = atoi(argv[1]);
@@ -132,6 +204,10 @@ int main(int argc, char **argv){
     if(checkInput(K,iter,N)){
         //enter the code
     }
+    struct vector *vec1 = head_vec;
+    struct vector *vec2 = head_vec->next;
+
     return 0;
+   
 }
 
