@@ -16,10 +16,16 @@ struct vector
     struct cord *cords;
 };
 
+typedef struct cluster_item_s
+{
+    struct vector *vector_item;
+    struct cluster_item_s *next;
+} cluster_item;
+
 struct cluster
 {
     struct vector *centroid;
-    struct vector *vector_list;
+    cluster_item * first_item;
     struct cluster *next;
 };
 
@@ -111,23 +117,31 @@ double coumpute_vector_distance(struct vector *vector1, struct vector *vector2)
     return sqrt(sum);
 }
 
-int add_to_cluster(struct vector *vec, struct cluster *currcluster, int N)  //adds vector to the right cluster
+void add_to_cluster(struct vector *vec, struct cluster *curr_cluster, int N)  //adds vector to the right cluster
 {
     struct cluster *min_cluster;
     double min_dist = 10000.0;  //NEED TO CHANGE TO ACTUAL MAX
-    struct cluster *curr_cluster;
     while(curr_cluster->next != NULL)
     {
         double curr_dist = coumpute_vector_distance((curr_cluster->centroid), vec);
-        if (curr_dist<min_dist)
+        if (curr_dist < min_dist)
         {
             min_cluster = curr_cluster;
             min_dist = curr_dist;
         }
     }
+    cluster_item * cluster_item = malloc(sizeof(cluster_item));
+    cluster_item->vector_item = vec;
     //now add vector to vector list of the min cluster
+    if (NULL == min_cluster->first_item) {
+        min_cluster->first_item = cluster_item;
+        return;
+    }
     
-    min_cluster->vector_list->next = vec;
+    if (NULL != min_cluster->first_item->next) {
+        cluster_item->next = min_cluster->first_item->next;
+    }
+    min_cluster->first_item->next = cluster_item;
 }
 
 
@@ -149,6 +163,15 @@ void print_vector(struct vector *head, int n, int d)
         head = head->next;
     }
     printf("\n");
+}
+
+void print_cluster(struct cluster *head, int n, int d)
+{
+    cluster_item *vec_in_cluster = head->first_item;
+    while (NULL != vec_in_cluster) {
+        print_vector(vec_in_cluster->vector_item, n , d);
+        vec_in_cluster = vec_in_cluster->next;
+    }
 }
 
 
