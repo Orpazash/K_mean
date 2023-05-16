@@ -4,10 +4,22 @@
 
 #define epsilon 0.001
 
+struct cord
+{
+    double value;
+    struct cord *next;
+};
+
+struct vector   
+{
+    struct vector *next;
+    struct cord *cords;
+};
+
 struct cluster
 {
-    double *centroid;
-    double **datapoints;
+    struct vector *centroid;
+    struct vector *vector_list;
     struct cluster *next;
 };
 
@@ -17,13 +29,14 @@ int readFile(FILE *f){
     double num;
     while (fscanf(f,"%f",&num)!= EOF){
         char c;
-        if((c = fgetc(f))!=EOF){
+        c = fgetc(f);
+        if(EOF != c){
             //same point
-             if(c== ","){
+             if(',' == c){
 
              }
              //moving to the next point
-             else if(c = "\n"){
+             else if('\n' == c){
                 
                 N+=1;
              }
@@ -56,10 +69,7 @@ int main(int argc, char **argv)
 {
     //read the file
     FILE *fileP;
-    if(argc==3)
-        fileP = fopen(argv[2],"r");
-    else
-        fileP = fopen(argv[3],"r");
+    fileP = fopen(argv[-1],"r");
     int N = readFile(fileP);
     fclose(fileP);
 
