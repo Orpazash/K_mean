@@ -63,7 +63,48 @@ int checkInput(int K, int iter, int N){
 
     return valid_input;
 }
+ //struct cord *cord1;
+ //struct vector vec1;
 
+ 
+double coumpute_vector_distance(struct vector *vector1, struct vector *vector2)
+{
+    double sum;
+    struct cord *curr_cord1,*curr_cord2;  //creating curr cordinates from vectors
+    curr_cord1 = vector1->cords;
+    curr_cord2 = vector2->cords;
+    while (curr_cord1->next != NULL) // going over all d cordinates
+    {
+        double cord1_data = curr_cord1->value;  //extracting values of cords 
+        double cord2_data = curr_cord2->value;
+
+        sum += pow(cord1_data - cord2_data, 2);
+
+        curr_cord1 = curr_cord1->next; // going to the next coordinate in both vectors
+        curr_cord2 = curr_cord2->next;
+    }
+
+    return sqrt(sum);
+}
+
+int add_to_cluster(struct vector *vec, struct cluster *currcluster, int N)  //adds vector to the right cluster
+{
+    struct cluster *curr_min_cluster;
+    struct cluster *curr_cluster;
+    while(curr_cluster->next != NULL)
+    {
+        double dist = coumpute_vector_distance(&(curr_cluster->centroid), vec);
+
+
+    }
+
+
+
+
+
+
+
+}
 
 int main(int argc, char **argv)
 {
