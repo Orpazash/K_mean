@@ -7,26 +7,26 @@
 typedef struct cord_s
 {
     double value;
-    struct cord *next;
+    struct cord_s *next;
 } cord;
 
 typedef struct vector_s   
 {
-    struct vector *next;
-    struct cord *cords;
+    struct vector_s *next;
+    cord *cords;
 } vector;
 
 typedef struct cluster_item_s
 {
-    struct vector_s *vector_item;
+    vector *vector_item;
     struct cluster_item_s *next;
 } cluster_item;
 
 typedef struct cluster_s
 {
-    struct vector_s *centroid;
+    vector *centroid;
     cluster_item * first_item;
-    struct cluster *next;
+    struct cluster_s *next;
 } cluster;
 
 
@@ -117,7 +117,7 @@ double coumpute_vector_distance(vector *vector1, vector *vector2)
     return sqrt(sum);
 }
 
-void add_to_cluster(struct vector *vec, cluster *curr_cluster, int N)  //adds vector to the right cluster
+void add_to_cluster(vector *vec, cluster *curr_cluster, int N)  //adds vector to the right cluster
 {
     cluster *min_cluster;
     double min_dist = 10000.0;  //NEED TO CHANGE TO ACTUAL MAX
@@ -204,8 +204,8 @@ int main(int argc, char **argv){
     if(checkInput(K,iter,N)){
         //enter the code
     }
-    struct vector *vec1 = head_vec;
-    struct vector *vec2 = head_vec->next;
+    vector *vec1 = head_vec;
+    vector *vec2 = head_vec->next;
 
     return 0;
    
