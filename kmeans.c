@@ -24,25 +24,43 @@ struct cluster
 };
 
 
-int readFile(FILE *f){
+int readFile(FILE *f, struct vector *curr_vec, int *D){
+    int dimention = 0;
+    int counterD = 0;
     int N = 0;
     double num;
-    while (fscanf(f,"%f",&num)!= EOF){
+    struct cord *head_cord, *curr_cord;
+    head_cord = malloc(sizeof(struct cord));
+    curr_cord = head_cord;
+    curr_cord->next = NULL;
+    while (fscanf(f,"%lf",&num)== 1){
         char c;
         c = fgetc(f);
         if(EOF != c){
             //same point
              if(',' == c){
-
+                curr_cord->value = num;
+                curr_cord->next = malloc(sizeof(struct cord));
+                curr_cord = curr_cord->next;
+                curr_cord->next = NULL;
+                if(*D == 0)
+                    counterD++;
              }
              //moving to the next point
              else if('\n' == c){
-                
-                N+=1;
+                curr_cord->value = num;
+                curr_vec->cords = head_cord;
+                curr_vec->next = malloc(sizeof(struct vector));
+                curr_vec = curr_vec->next;
+                curr_vec->next = NULL;
+                head_cord = malloc(sizeof(struct cord));
+                curr_cord = head_cord;
+                curr_cord->next = NULL;
+                if(*D == 0)
+                    *D = counterD+1;
+                N++;
              }
         }
-        else
-            break;
     }
     return N;
 }
@@ -56,7 +74,7 @@ int checkInput(int K, int iter, int N){
     }
 
     //check K
-    if( iter <= 1 || iter >= N){
+    if( K <= 1 || K >= N){
         printf("Invalid number of clusters!");
         valid_input = 0;
     }
@@ -64,14 +82,44 @@ int checkInput(int K, int iter, int N){
     return valid_input;
 }
 
-
-int main(int argc, char **argv)
+void print_cords(struct cord *head, int d)
 {
+    for(int i = 0; i<d-1; ++i){
+        printf("%.4f, ", head->value);
+        head = head->next;
+    }
+    printf("%.4f", head->value);
+    printf("\n");
+}
+
+void print_vector(struct vector *head, int n, int d)
+{
+    for(int i = 0; i<n; ++i){
+        print_cords(head->cords, d);
+        head = head->next;
+    }
+    printf("\n");
+}
+
+
+int main(int argc, char **argv){
+    int D = 0;
     //read the file
+    char file_name[100];
+    scanf("%s", file_name);
     FILE *fileP;
-    fileP = fopen(argv[-1],"r");
-    int N = readFile(fileP);
+    fileP = fopen(file_name,"r");
+    struct vector *head_vec,*curr_vec;
+    head_vec = malloc(sizeof(struct vector));
+    curr_vec = head_vec;
+    curr_vec->next = NULL;
+    int N = readFile(fileP, curr_vec, &D);
     fclose(fileP);
+
+    printf("%d\n", D);
+    printf("%d\n", N);
+    print_vector(head_vec, N, D);
+    scanf("%s", file_name);
 
     // get and check inputs
     int K = atoi(argv[1]);
