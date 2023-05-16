@@ -4,39 +4,39 @@
 
 #define epsilon 0.001
 
-struct cord
+typedef struct cord_s
 {
     double value;
     struct cord *next;
-};
+} cord;
 
-struct vector   
+typedef struct vector_s   
 {
     struct vector *next;
     struct cord *cords;
-};
+} vector;
 
 typedef struct cluster_item_s
 {
-    struct vector *vector_item;
+    struct vector_s *vector_item;
     struct cluster_item_s *next;
 } cluster_item;
 
-struct cluster
+typedef struct cluster_s
 {
-    struct vector *centroid;
+    struct vector_s *centroid;
     cluster_item * first_item;
     struct cluster *next;
-};
+} cluster;
 
 
-int readFile(FILE *f, struct vector *curr_vec, int *D){
+int readFile(FILE *f, vector *curr_vec, int *D){
     int dimention = 0;
     int counterD = 0;
     int N = 0;
     double num;
-    struct cord *head_cord, *curr_cord;
-    head_cord = malloc(sizeof(struct cord));
+    cord *head_cord, *curr_cord;
+    head_cord = malloc(sizeof(cord));
     curr_cord = head_cord;
     curr_cord->next = NULL;
     while (fscanf(f,"%lf",&num)== 1){
@@ -46,7 +46,7 @@ int readFile(FILE *f, struct vector *curr_vec, int *D){
             //same point
              if(',' == c){
                 curr_cord->value = num;
-                curr_cord->next = malloc(sizeof(struct cord));
+                curr_cord->next = malloc(sizeof(cord));
                 curr_cord = curr_cord->next;
                 curr_cord->next = NULL;
                 if(*D == 0)
@@ -56,10 +56,10 @@ int readFile(FILE *f, struct vector *curr_vec, int *D){
              else if('\n' == c){
                 curr_cord->value = num;
                 curr_vec->cords = head_cord;
-                curr_vec->next = malloc(sizeof(struct vector));
+                curr_vec->next = malloc(sizeof(vector));
                 curr_vec = curr_vec->next;
                 curr_vec->next = NULL;
-                head_cord = malloc(sizeof(struct cord));
+                head_cord = malloc(sizeof(cord));
                 curr_cord = head_cord;
                 curr_cord->next = NULL;
                 if(*D == 0)
@@ -91,10 +91,10 @@ int checkInput(int K, int iter, int N){
  //struct vector vec1;
 
  
-double coumpute_vector_distance(struct vector *vector1, struct vector *vector2)
+double coumpute_vector_distance(vector *vector1, vector *vector2)
 {
     double sum;
-    struct cord *curr_cord1,*curr_cord2;  //creating curr cordinates from vectors
+    cord *curr_cord1,*curr_cord2;  //creating curr cordinates from vectors
     curr_cord1 = vector1->cords;
     curr_cord2 = vector2->cords;
 
@@ -117,9 +117,9 @@ double coumpute_vector_distance(struct vector *vector1, struct vector *vector2)
     return sqrt(sum);
 }
 
-void add_to_cluster(struct vector *vec, struct cluster *curr_cluster, int N)  //adds vector to the right cluster
+void add_to_cluster(struct vector *vec, cluster *curr_cluster, int N)  //adds vector to the right cluster
 {
-    struct cluster *min_cluster;
+    cluster *min_cluster;
     double min_dist = 10000.0;  //NEED TO CHANGE TO ACTUAL MAX
     while(curr_cluster->next != NULL)
     {
@@ -146,7 +146,7 @@ void add_to_cluster(struct vector *vec, struct cluster *curr_cluster, int N)  //
 
 
 
-void print_cords(struct cord *head, int d)
+void print_cords(cord *head, int d)
 {
     for(int i = 0; i<d-1; ++i){
         printf("%.4f, ", head->value);
@@ -156,7 +156,7 @@ void print_cords(struct cord *head, int d)
     printf("\n");
 }
 
-void print_vector(struct vector *head, int n, int d)
+void print_vector(vector *head, int n, int d)
 {
     for(int i = 0; i<n; ++i){
         print_cords(head->cords, d);
@@ -165,7 +165,7 @@ void print_vector(struct vector *head, int n, int d)
     printf("\n");
 }
 
-void print_cluster(struct cluster *head, int n, int d)
+void print_cluster(cluster *head, int n, int d)
 {
     cluster_item *vec_in_cluster = head->first_item;
     while (NULL != vec_in_cluster) {
@@ -182,8 +182,8 @@ int main(int argc, char **argv){
     scanf("%s", file_name);
     FILE *fileP;
     fileP = fopen(file_name,"r");
-    struct vector *head_vec,*curr_vec;
-    head_vec = malloc(sizeof(struct vector));
+    vector *head_vec,*curr_vec;
+    head_vec = malloc(sizeof(vector));
     curr_vec = head_vec;
     curr_vec->next = NULL;
     int N = readFile(fileP, curr_vec, &D);
