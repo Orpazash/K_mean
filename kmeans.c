@@ -24,25 +24,43 @@ struct cluster
 };
 
 
-int readFile(FILE *f){
+int readFile(FILE *f, struct vector *curr_vec, int *D){
+    int dimention = 0;
+    int counterD = 0;
     int N = 0;
     double num;
-    while (fscanf(f,"%f",&num)!= EOF){
+    struct cord *head_cord, *curr_cord;
+    head_cord = malloc(sizeof(struct cord));
+    curr_cord = head_cord;
+    curr_cord->next = NULL;
+    while (fscanf(f,"%lf",&num)== 1){
         char c;
         c = fgetc(f);
         if(EOF != c){
             //same point
              if(',' == c){
-
+                curr_cord->value = num;
+                curr_cord->next = malloc(sizeof(struct cord));
+                curr_cord = curr_cord->next;
+                curr_cord->next = NULL;
+                if(*D == 0)
+                    counterD++;
              }
              //moving to the next point
              else if('\n' == c){
-                
-                N+=1;
+                curr_cord->value = num;
+                curr_vec->cords = head_cord;
+                curr_vec->next = malloc(sizeof(struct vector));
+                curr_vec = curr_vec->next;
+                curr_vec->next = NULL;
+                head_cord = malloc(sizeof(struct cord));
+                curr_cord = head_cord;
+                curr_cord->next = NULL;
+                if(*D == 0)
+                    *D = counterD+1;
+                N++;
              }
         }
-        else
-            break;
     }
     return N;
 }
@@ -56,7 +74,7 @@ int checkInput(int K, int iter, int N){
     }
 
     //check K
-    if( iter <= 1 || iter >= N){
+    if( K <= 1 || K >= N){
         printf("Invalid number of clusters!");
         valid_input = 0;
     }
@@ -73,15 +91,21 @@ double coumpute_vector_distance(struct vector *vector1, struct vector *vector2)
     struct cord *curr_cord1,*curr_cord2;  //creating curr cordinates from vectors
     curr_cord1 = vector1->cords;
     curr_cord2 = vector2->cords;
+
+    double cord1_data = curr_cord1->value;  //extracting values of first cords and adding to sum 
+    double cord2_data = curr_cord2->value;
+    sum += pow(cord1_data - cord2_data, 2);
+
     while (curr_cord1->next != NULL) // going over all d cordinates
     {
+        curr_cord1 = curr_cord1->next; // going to the next coordinate in both vectors
+        curr_cord2 = curr_cord2->next;
+
         double cord1_data = curr_cord1->value;  //extracting values of cords 
         double cord2_data = curr_cord2->value;
 
         sum += pow(cord1_data - cord2_data, 2);
 
-        curr_cord1 = curr_cord1->next; // going to the next coordinate in both vectors
-        curr_cord2 = curr_cord2->next;
     }
 
     return sqrt(sum);
@@ -89,30 +113,62 @@ double coumpute_vector_distance(struct vector *vector1, struct vector *vector2)
 
 int add_to_cluster(struct vector *vec, struct cluster *currcluster, int N)  //adds vector to the right cluster
 {
-    struct cluster *curr_min_cluster;
+    struct cluster *min_cluster;
+    double min_dist = 10000.0;  //NEED TO CHANGE TO ACTUAL MAX
     struct cluster *curr_cluster;
     while(curr_cluster->next != NULL)
     {
-        double dist = coumpute_vector_distance(&(curr_cluster->centroid), vec);
-
-
+        double curr_dist = coumpute_vector_distance((curr_cluster->centroid), vec);
+        if (curr_dist<min_dist)
+        {
+            min_cluster = curr_cluster;
+            min_dist = curr_dist;
+        }
     }
-
-
-
-
-
-
-
+    //now add vector to vector list of the min cluster
+    
+    min_cluster->vector_list->next = vec;
 }
 
-int main(int argc, char **argv)
+
+
+void print_cords(struct cord *head, int d)
 {
+    for(int i = 0; i<d-1; ++i){
+        printf("%.4f, ", head->value);
+        head = head->next;
+    }
+    printf("%.4f", head->value);
+    printf("\n");
+}
+
+void print_vector(struct vector *head, int n, int d)
+{
+    for(int i = 0; i<n; ++i){
+        print_cords(head->cords, d);
+        head = head->next;
+    }
+    printf("\n");
+}
+
+
+int main(int argc, char **argv){
+    int D = 0;
     //read the file
+    char file_name[100];
+    scanf("%s", file_name);
     FILE *fileP;
-    fileP = fopen(argv[-1],"r");
-    int N = readFile(fileP);
+    fileP = fopen(file_name,"r");
+    struct vector *head_vec,*curr_vec;
+    head_vec = malloc(sizeof(struct vector));
+    curr_vec = head_vec;
+    curr_vec->next = NULL;
+    int N = readFile(fileP, curr_vec, &D);
     fclose(fileP);
+
+    printf("%d\n", D);
+    printf("%d\n", N);
+    print_vector(head_vec, N, D);
 
     // get and check inputs
     int K = atoi(argv[1]);
@@ -125,6 +181,10 @@ int main(int argc, char **argv)
     if(checkInput(K,iter,N)){
         //enter the code
     }
+    struct vector *vec1 = head_vec;
+    struct vector *vec2 = head_vec->next;
+
     return 0;
+   
 }
 
