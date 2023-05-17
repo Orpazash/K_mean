@@ -98,52 +98,54 @@ double coumpute_vector_distance(vector *vector1, vector *vector2)
     curr_cord1 = vector1->cords;
     curr_cord2 = vector2->cords;
 
-    double cord1_data = curr_cord1->value;  //extracting values of first cords and adding to sum 
-    double cord2_data = curr_cord2->value;
-    sum += pow(cord1_data - cord2_data, 2);
-
-    while (curr_cord1->next != NULL) // going over all d cordinates
+    while (curr_cord1 != NULL) // going over all d cordinates
     {
-        curr_cord1 = curr_cord1->next; // going to the next coordinate in both vectors
-        curr_cord2 = curr_cord2->next;
-
         double cord1_data = curr_cord1->value;  //extracting values of cords 
         double cord2_data = curr_cord2->value;
 
         sum += pow(cord1_data - cord2_data, 2);
 
+        curr_cord1 = curr_cord1->next; // going to the next coordinate in both vectors
+        curr_cord2 = curr_cord2->next;
     }
 
     return sqrt(sum);
 }
 
-void add_to_cluster(vector *vec, cluster *curr_cluster, int N)  //adds vector to the right cluster
+void add_to_cluster(vector *vec, cluster *curr_cluster)  //adds vector to the right cluster
 {
     cluster *min_cluster;
     double min_dist = 10000.0;  //NEED TO CHANGE TO ACTUAL MAX
-    while(curr_cluster->next != NULL)
-    {
+
+    while(curr_cluster != NULL){   
         double curr_dist = coumpute_vector_distance((curr_cluster->centroid), vec);
-        if (curr_dist < min_dist)
-        {
+        if (curr_dist < min_dist){
             min_cluster = curr_cluster;
             min_dist = curr_dist;
         }
+        curr_cluster = curr_cluster->next;
     }
-    cluster_item * cluster_item = malloc(sizeof(cluster_item));
+    cluster_item * cluster_item = malloc(sizeof(cluster_item)); // creating new cluster item to insert cluster's list
     cluster_item->vector_item = vec;
     //now add vector to vector list of the min cluster
-    if (NULL == min_cluster->first_item) {
+    if (NULL == min_cluster->first_item) {  // if this is the first cluster item
         min_cluster->first_item = cluster_item;
         return;
     }
     
-    if (NULL != min_cluster->first_item->next) {
+    if (NULL != min_cluster->first_item->next) { // if there are 2 items or more, append the secont item to the new item's next, and add the new after the first
         cluster_item->next = min_cluster->first_item->next;
     }
     min_cluster->first_item->next = cluster_item;
 }
 
+void add_all_to_clusters(vector *headvec, cluster *cluster) {
+    vector *curr_vec = headvec;
+    while(NULL != curr_vec){
+        add_to_cluster(curr_vec, cluster);
+        curr_vec = curr_vec->next;
+    }
+}
 
 
 void print_cords(cord *head, int d)
@@ -204,8 +206,12 @@ int main(int argc, char **argv){
     if(checkInput(K,iter,N)){
         //enter the code
     }
+
     vector *vec1 = head_vec;
     vector *vec2 = head_vec->next;
+
+    printf("%lf",coumpute_vector_distance(vec1,vec2));
+    scanf("%lf");
 
     return 0;
    
