@@ -127,7 +127,7 @@ void add_to_cluster(vector *vec, cluster *curr_cluster)  //adds vector to the ri
     }
     cluster_item * cluster_item = malloc(sizeof(cluster_item)); // creating new cluster item to insert cluster's list
     cluster_item->vector_item = vec;
-    //now add vector to vector list of the min cluster
+    //now add vector to vector list of the min cluster:
     if (NULL == min_cluster->first_item) {  // if this is the first cluster item
         min_cluster->first_item = cluster_item;
         return;
@@ -145,6 +145,23 @@ void add_all_to_clusters(vector *headvec, cluster *cluster) {
         add_to_cluster(curr_vec, cluster);
         curr_vec = curr_vec->next;
     }
+}
+
+int check_epsilon(cluster *old_cluster, cluster *new_cluster) {  //returns 1 if all smaller than epsilon, 0 if not
+    
+    while (NULL != old_cluster){
+        vector *curr_old_centroid = old_cluster->centroid;
+        vector *curr_new_centroid = new_cluster->centroid;
+
+        double curr_dist = coumpute_vector_distance(curr_old_centroid, curr_new_centroid);
+        if (curr_dist > epsilon){
+            return 0;
+        }
+        old_cluster = old_cluster->next;
+        new_cluster = new_cluster->next;
+    
+    }
+    return 1;
 }
 
 
@@ -207,12 +224,25 @@ int main(int argc, char **argv){
         //enter the code
     }
 
+    // create first k clusters (with empty vector list)
+    vector *curr_vec = head_vec;
+    cluster *old_cluster = malloc(sizeof(cluster)); //creating first cluster
+    old_cluster->centroid = curr_vec;  //putting first vector in it
+    cluster *curr_cluster = old_cluster;  //curr cluster is first cluster
+    for(int i = 0; i < K; ++i ){
+        curr_cluster->next = malloc(sizeof(cluster));  // creating new cluster at current cluster's next
+        curr_cluster = curr_cluster->next;  // advancing to new cluster 
+        curr_vec = curr_vec->next;  // advancing to next vector
+        curr_cluster->centroid = curr_vec;  // puting next vector at new cluster
+    }
+
+/*
     vector *vec1 = head_vec;
     vector *vec2 = head_vec->next;
 
     printf("%lf",coumpute_vector_distance(vec1,vec2));
     scanf("%lf");
-
+*/
     return 0;
    
 }
