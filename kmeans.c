@@ -168,7 +168,7 @@ int check_epsilon(cluster *old_cluster, cluster *new_cluster) {  //returns 1 if 
         new_cluster = new_cluster->next;
     
     }
-    return 1;
+    return 1; 
 }
 
 
@@ -327,8 +327,8 @@ int main(int argc, char **argv) {
     vector *vec2 = head_vec->next;
 
     printf("%lf",coumpute_vector_distance(vec1,vec2));
-*/
     scanf("%lf");
+*/
 
     return 0;
    
