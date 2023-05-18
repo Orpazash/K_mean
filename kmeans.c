@@ -255,7 +255,8 @@ void free_cords(cord *my_cord){
         cord *temp_cord = my_cord;
         my_cord = my_cord->next;
         free(temp_cord);
-    }    
+    }
+    free(my_cord);    
 }
 
 void free_vector(vector *v){
@@ -266,6 +267,7 @@ void free_vector(vector *v){
         free_cords(temp_vec->cords);
         free(temp_vec);
     }
+    free(v);
 }
 
 void free_cluster_item(cluster_item *ci){
@@ -276,6 +278,7 @@ void free_cluster_item(cluster_item *ci){
         free_vector(temp_ci->vector_item);
         free(temp_ci);
     }
+    free(ci);
 }
 
 void free_cluster(cluster *clust){
@@ -287,6 +290,7 @@ void free_cluster(cluster *clust){
         free_vector(temp_clust->centroid);
         free(temp_clust);
     }
+    free(clust);
 }
 
 
