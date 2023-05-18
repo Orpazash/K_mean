@@ -249,6 +249,47 @@ vector* compute_centroid(cluster *old_cluster, int d) {
     return centroid;
 }
 
+void free_cords(cord *my_cord){
+    while (NULL != my_cord)
+    {
+        cord *temp_cord = my_cord;
+        my_cord = my_cord->next;
+        free(temp_cord);
+    }    
+}
+
+void free_vector(vector *v){
+    while (NULL != v)
+    {
+        vector *temp_vec = v;
+        v = v->next;
+        free_cords(temp_vec->cords);
+        free(temp_vec);
+    }
+}
+
+void free_cluster_item(cluster_item *ci){
+    while (NULL != ci)
+    {
+        cluster_item *temp_ci = ci;
+        ci = ci->next;
+        free_vector(temp_ci->vector_item);
+        free(temp_ci);
+    }
+}
+
+void free_cluster(cluster *clust){
+    while (NULL != clust)
+    {
+        cluster *temp_clust = clust;
+        clust = clust->next;
+        free_cluster_item(temp_clust->first_item);
+        free_vector(temp_clust->centroid);
+        free(temp_clust);
+    }
+}
+
+
 int main(int argc, char **argv) {
     int D = 0;
     //read the file
@@ -314,22 +355,16 @@ int main(int argc, char **argv) {
             //update old centroids array
             cluster *temp = old_cluster;
             old_cluster = new_cluster;
-            free(temp);
+            free_cluster(temp); //free the old cluster
             iter_count++;
             //print_clusters(old_cluster, D);
         }
         //printing the K centroids
         print_clusters(old_cluster, D);
+        free_cluster(old_cluster); //free the cluster after its printing
     }
-
-/*
-    vector *vec1 = head_vec;
-    vector *vec2 = head_vec->next;
-
-    printf("%lf",coumpute_vector_distance(vec1,vec2));
-    scanf("%lf");
-*/
-
+    free_vector(head_vec); //free the vector with the information from the file
+    //scanf("%lf");
     return 0;
    
 }
