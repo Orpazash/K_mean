@@ -10,7 +10,7 @@ typedef struct cord_s
     struct cord_s *next;
 } cord;
 
-typedef struct vector_s   
+typedef struct vector_s
 {
     struct vector_s *next;
     cord *cords;
@@ -96,7 +96,7 @@ int checkInput(int K, int iter, int N){
 
     return valid_input;
 }
- 
+
 double coumpute_vector_distance(vector *vector1, vector *vector2)
 {
     double sum = 0;
@@ -106,7 +106,7 @@ double coumpute_vector_distance(vector *vector1, vector *vector2)
 
     while (curr_cord1 != NULL) // going over all d cordinates
     {
-        double cord1_data = curr_cord1->value;  //extracting values of cords 
+        double cord1_data = curr_cord1->value;  //extracting values of cords
         double cord2_data = curr_cord2->value;
 
         sum += pow(cord1_data - cord2_data, 2);
@@ -123,7 +123,7 @@ void add_to_cluster(vector *vec, cluster *curr_cluster)  //adds vector to the ri
     cluster *min_cluster;
     double min_dist = 10000.0;  //NEED TO CHANGE TO ACTUAL MAX
 
-    while(NULL != curr_cluster){   
+    while(NULL != curr_cluster){
         double curr_dist = coumpute_vector_distance((curr_cluster->centroid), vec);
         if (curr_dist < min_dist){
             min_cluster = curr_cluster;
@@ -139,7 +139,7 @@ void add_to_cluster(vector *vec, cluster *curr_cluster)  //adds vector to the ri
         min_cluster->first_item = cluster_item;
         return;
     }
-    
+
     if (NULL != min_cluster->first_item->next) { // if there are 2 items or more, append the secont item to the new item's next, and add the new after the first
         cluster_item->next = min_cluster->first_item->next;
     }
@@ -155,7 +155,7 @@ void add_all_to_clusters(vector *headvec, cluster *cluster) {
 }
 
 int check_epsilon(cluster *old_cluster, cluster *new_cluster) {  //returns 1 if all smaller than epsilon, 0 if not
-    
+
     while (NULL != old_cluster){
         vector *curr_old_centroid = old_cluster->centroid;
         vector *curr_new_centroid = new_cluster->centroid;
@@ -166,9 +166,9 @@ int check_epsilon(cluster *old_cluster, cluster *new_cluster) {  //returns 1 if 
         }
         old_cluster = old_cluster->next;
         new_cluster = new_cluster->next;
-    
+
     }
-    return 1; 
+    return 1;
 }
 
 
@@ -212,7 +212,7 @@ void print_clusters(cluster *head, int d) {
 vector* compute_centroid(cluster *old_cluster, int d) {
     vector * centroid = malloc(sizeof(vector));
     centroid->next = NULL;
-    
+
     cord head;
     cord* curr = &head;
     for(int i = 0; i < d; i++){
@@ -256,7 +256,7 @@ void free_cords(cord *my_cord){
         my_cord = my_cord->next;
         free(temp_cord);
     }
-    free(my_cord);    
+    free(my_cord);
 }
 
 void free_vector(vector *v){
@@ -267,7 +267,6 @@ void free_vector(vector *v){
         free_cords(temp_vec->cords);
         free(temp_vec);
     }
-    free(v);
 }
 
 void free_cluster_item(cluster_item *ci){
@@ -275,10 +274,8 @@ void free_cluster_item(cluster_item *ci){
     {
         cluster_item *temp_ci = ci;
         ci = ci->next;
-        free_vector(temp_ci->vector_item);
         free(temp_ci);
     }
-    free(ci);
 }
 
 void free_cluster(cluster *clust){
@@ -290,7 +287,6 @@ void free_cluster(cluster *clust){
         free_vector(temp_clust->centroid);
         free(temp_clust);
     }
-    free(clust);
 }
 
 
@@ -315,22 +311,38 @@ int main(int argc, char **argv) {
         iter = atoi(argv[2]);
     }
 
-    // if the inputs are valid 
+    // if the inputs are valid
     if(checkInput(K,iter,N)) {
         // create first k clusters (with empty vector list)
         vector *curr_vec = head_vec;
-        cluster *old_cluster = malloc(sizeof(cluster)); //creating first cluster
-        old_cluster->centroid = curr_vec;  //putting first vector in it
-        cluster *curr_cluster = old_cluster;  //curr cluster is first cluster
+        cluster head_cluster;
+        cluster *curr_cluster = &head_cluster;  //curr cluster is first cluster
         curr_cluster->first_item = NULL;
-        for(int i = 0; i < K-1; ++i ) {
+
+        for(int i = 0; i < K; ++i ) {
             curr_cluster->next = malloc(sizeof(cluster));  // creating new cluster at current cluster's next
-            curr_cluster = curr_cluster->next;  // advancing to new cluster 
-            curr_vec = curr_vec->next;  // advancing to next vector
-            curr_cluster->centroid = curr_vec;  // puting next vector at new cluster
+            curr_cluster = curr_cluster->next;  // advancing to new cluster
+            curr_cluster->centroid = malloc(sizeof(vector));  // puting next vector at new cluster
+            cord new_cord;
+            cord *cur_cord = curr_vec->cords;
+            cord *new_curr_cord= &new_cord;
+            while (NULL != cur_cord)
+            {
+                new_curr_cord->next = malloc(sizeof(cord));
+                new_curr_cord = new_curr_cord->next;
+                new_curr_cord->value = cur_cord->value;
+                cur_cord = cur_cord->next;
+            }
+            new_curr_cord->next=NULL;
+
+            curr_cluster->centroid->cords = new_cord.next;
+            curr_cluster->centroid->next = NULL;
             curr_cluster->first_item = NULL;
+            curr_vec = curr_vec->next;  // advancing to next vector
         }
         curr_cluster->next = NULL;
+        cluster *old_cluster = head_cluster.next; //creating first cluster
+
         int iter_count = 0;
         while(1){
             //check if we finished the iterations
@@ -353,15 +365,17 @@ int main(int argc, char **argv) {
             curr_cluster->next = NULL;
             cluster *new_cluster =  new_clusters.next;
             // if delta of all the dots smaller than epsilon
-            if(check_epsilon(old_cluster,new_cluster))
+            if(check_epsilon(old_cluster,new_cluster)) {
+                free(new_cluster);
                 break;
+            }
 
             //update old centroids array
             cluster *temp = old_cluster;
             old_cluster = new_cluster;
             free_cluster(temp); //free the old cluster
             iter_count++;
-            //print_clusters(old_cluster, D);
+            
         }
         //printing the K centroids
         print_clusters(old_cluster, D);
@@ -370,5 +384,5 @@ int main(int argc, char **argv) {
     free_vector(head_vec); //free the vector with the information from the file
     //scanf("%lf");
     return 0;
-   
+
 }
