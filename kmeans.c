@@ -69,7 +69,6 @@ void free_cluster(cluster *clust){
 }
 
 int readFile(vector *curr_vec, int *D){
-    int dimention = 0;
     int counterD = 0;
     int N = 0;
     double num;
