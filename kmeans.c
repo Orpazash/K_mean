@@ -68,7 +68,7 @@ void free_cluster(cluster *clust){
     }
 }
 
-int readFile(FILE *f, vector *curr_vec, int *D){
+int readFile(vector *curr_vec, int *D){
     int dimention = 0;
     int counterD = 0;
     int N = 0;
@@ -80,47 +80,44 @@ int readFile(FILE *f, vector *curr_vec, int *D){
     }
     curr_cord = head_cord;
     curr_cord->next = NULL;
-    while (fscanf(f,"%lf",&num)== 1){
-        char c;
-        c = fgetc(f);
-        if(EOF != c){
-            //same point
-             if(',' == c){
-                curr_cord->value = num;
-                curr_cord->next = malloc(sizeof(cord));
-                if (NULL == curr_cord->next) {
-                    free(head_cord);
-                    return -1;
-                }
-                curr_cord = curr_cord->next;
-                curr_cord->next = NULL;
-                if(*D == 0)
-                    counterD++;
-             }
-             //moving to the next point
-             else if('\n' == c){
-                curr_cord->value = num;
-                if (NULL != curr_vec->next) {
-                    curr_vec = curr_vec->next;
-                }
-                curr_vec->cords = head_cord;
-                curr_vec->next = malloc(sizeof(vector));
-                if (curr_vec->next == NULL) {
-                    return -1;
-                }
-                curr_vec->next->next = NULL;
-                curr_vec->next->cords = NULL;
-                head_cord = malloc(sizeof(cord));  
-                if (head_cord == NULL) {   
-                    return -1;
-                }
-                curr_cord = head_cord;
-                curr_cord->next = NULL;
-                if(*D == 0)
-                    *D = counterD+1;
-                N++;
-             }
+    char c;
+    while (scanf("%lf%c",&num, &c)== 2){
+        //same point
+        if(',' == c){
+            curr_cord->value = num;
+            curr_cord->next = malloc(sizeof(cord));
+            if (NULL == curr_cord->next) {
+                free(head_cord);
+                return -1;
+            }
+            curr_cord = curr_cord->next;
+            curr_cord->next = NULL;
+            if(*D == 0)
+                counterD++;
         }
+        //moving to the next point
+        else if('\n' == c){
+            curr_cord->value = num;
+            if (NULL != curr_vec->next) {
+                curr_vec = curr_vec->next;
+            }
+            curr_vec->cords = head_cord;
+            curr_vec->next = malloc(sizeof(vector));
+            if (curr_vec->next == NULL) {
+                return -1;
+            }
+            curr_vec->next->next = NULL;
+            curr_vec->next->cords = NULL;
+            head_cord = malloc(sizeof(cord));  
+            if (head_cord == NULL) {   
+                return -1;
+            }
+            curr_cord = head_cord;
+            curr_cord->next = NULL;
+            if(*D == 0)
+                *D = counterD+1;
+            N++;
+            }
     }
     if(NULL == curr_vec->next->cords){
         free(curr_vec->next);
@@ -317,11 +314,7 @@ vector* compute_centroid(cluster *old_cluster, int d) {
 
 int main(int argc, char **argv) {
     int D = 0;
-    //read the file
-    char file_name[100];
-    scanf("%s", file_name);
-    FILE *fileP;
-    fileP = fopen(file_name,"r");
+    //read the file and save N (number of points)
     vector *head_vec,*curr_vec;
     head_vec = malloc(sizeof(vector));
     if (NULL == head_vec) {
@@ -330,11 +323,10 @@ int main(int argc, char **argv) {
     head_vec->cords = NULL;
     curr_vec = head_vec;
     curr_vec->next = NULL;
-    int N = readFile(fileP, curr_vec, &D);
+    int N = readFile(curr_vec, &D);
     if (0 > N ) {  //that means one of the malloc failed, func returned -1
         goto error;
     }
-    fclose(fileP);
 
     // get and check inputs
     int K = atoi(argv[1]);
