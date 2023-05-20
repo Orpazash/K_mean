@@ -311,11 +311,11 @@ vector* compute_centroid(cluster *old_cluster, int d) {
         }
 
         /*update the value of the i's cord of the centroid*/
-        curr->value = round(10000*(total/counter))/10000;
+        curr->value = total/counter;
         curr = curr->next;
     }
 
-    return centroid;
+    return centroid;total
 }
 
 int main(int argc, char **argv) {
