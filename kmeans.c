@@ -427,7 +427,7 @@ int main(int argc, char **argv) {
         new_cluster =  new_clusters.next;
         /* if delta of all the dots smaller than epsilon*/
         if(1 == check_epsilon(old_cluster,new_cluster)) {
-            free(new_cluster);
+            free_cluster(new_cluster);
             break;
         }
 
