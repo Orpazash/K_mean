@@ -144,7 +144,6 @@ int checkInput(int K, int iter, int N){
         printf("Invalid number of clusters!\n");
         valid_input = 0;
     }
-
     return valid_input;
 }
 
@@ -340,10 +339,10 @@ int main(int argc, char **argv) {
     // get and check inputs
     int K = atoi(argv[1]);
     int iter = 200;
-    if(argc==3){
+    if(argc>=3){
         iter = atoi(argv[2]);
     }
-    // if the inputs are valid
+    // if the inputs aren't valid
     if(1 != checkInput(K,iter,N)) {
         goto known_error;
     }

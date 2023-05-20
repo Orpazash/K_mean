@@ -2,6 +2,7 @@ from sys import argv
 
 EPSILON = 0.001
 
+
 def compute_distance(dot1, dot2):  # dot1 and dot2 are arrays
     coordinates_square = []
     summ = 0
@@ -19,6 +20,8 @@ def compute_distance(dot1, dot2):  # dot1 and dot2 are arrays
   gets dot and centroid list, adds the dot to the right cluster, returns None
   !! the list old_centroids is a list of tuples -> (centroid_0, cluster_0 array), where the cluster arrays are empty
 """
+
+
 def add_to_cluster(dot: list, old_centroids: list):
     curr_min = float('inf')
     chosen_centroid = None
@@ -32,13 +35,20 @@ def add_to_cluster(dot: list, old_centroids: list):
     chosen_centroid[1].append(dot)
     return None
 
-def check_delta_cenroids(old_centroids: list, new_centroids: list):  # returns true if delta smaller than epsilon
-    for i in range(0, len(old_centroids)):  # CAN CHANGE TO K
+
+"""
+returns true if delta smaller than epsilon
+"""
+def check_delta_cenroids(old_centroids: list, new_centroids: list):
+    for i in range(0, len(old_centroids)):
         if compute_distance(new_centroids[i][0], old_centroids[i][0]) > EPSILON:
             return False
     return True
 
 
+"""
+compute new centroids
+"""
 def compute_centroid(cluster_array: list):
     new_centroid = []
     for d in range(D):
@@ -51,6 +61,8 @@ def compute_centroid(cluster_array: list):
 
 def read_file(N: int, dots_arr: list):
     # reading the file, compute N and the array of the dots
+    # It was written in the forum that the number and order of inputs should be fine
+    # meaning the file name is the last argument
     data_file = open(argv[-1], "r")
     # reading line by line (dot by dot)
     line = data_file.readline()
@@ -60,7 +72,6 @@ def read_file(N: int, dots_arr: list):
         N += 1
     data_file.close()
     return N
-
 
 
 def check_inputs(K, iter_num):
@@ -119,5 +130,6 @@ if check_inputs(K, iter_num):
         # printing the K centroids
         for k in range(K):
             print(",".join(["%.4f" % old_centroids[k][0][d] for d in range(D)]))
+        print("") # adding new empty line at the end
     except:
         print("An Error Has Occurred")
