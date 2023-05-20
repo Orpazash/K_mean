@@ -333,7 +333,6 @@ int main(int argc, char **argv) {
     curr_vec->next = NULL;
     int N = readFile(fileP, curr_vec, &D);
     if (0 > N ) {  //that means one of the malloc failed, func returned -1
-        puts("fuck this life");
         goto error;
     }
     fclose(fileP);
@@ -344,7 +343,6 @@ int main(int argc, char **argv) {
     if(argc==3){
         iter = atoi(argv[2]);
     }
-    printf("K: %d, iter: %d, N: %d\n", K, iter, N);
     // if the inputs are valid
     if(1 != checkInput(K,iter,N)) {
         goto known_error;
