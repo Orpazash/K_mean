@@ -98,7 +98,7 @@ int readFile(vector *curr_vec, int *D){
         /*moving to the next point*/
         else if('\n' == c){
             curr_cord->value = num;
-            if (NULL != curr_vec->next) {
+            if (NULL != curr_vec->next) {  /*if not first vec, advance*/
                 curr_vec = curr_vec->next;
             }
             curr_vec->cords = head_cord;
@@ -119,11 +119,11 @@ int readFile(vector *curr_vec, int *D){
             N++;
             }
     }
-    if(NULL == curr_vec->next->cords){
-        free(curr_vec->next);
-        curr_vec->next= NULL;
-        free(head_cord);
-    }
+    /*if(NULL == curr_vec->next->cords){*/
+    free(curr_vec->next);
+    curr_vec->next= NULL;
+    free(head_cord);
+    
 
     return N;
 }
@@ -179,7 +179,7 @@ int add_to_cluster(vector *vec, cluster *curr_cluster)  /*adds vector to the rig
         }
         curr_cluster = curr_cluster->next;
     }
-    cluster_item = malloc(sizeof(cluster_item)); /* creating new cluster item to insert cluster's list*/
+    cluster_item = malloc(16); /* creating new cluster item to insert cluster's list*/
     if(cluster_item == NULL) {
         return 0;  /*if error func returns 0*/
     }
@@ -259,7 +259,6 @@ void print_cluster(cluster *head, int d)
 
 void print_clusters(cluster *head, int d) {
     while (NULL !=head) {
-        /* print_cluster(head, d);*/
         print_cords(head->centroid->cords, d);
         head = head->next;
     }
@@ -315,7 +314,7 @@ vector* compute_centroid(cluster *old_cluster, int d) {
         curr = curr->next;
     }
 
-    return centroid;total
+    return centroid;
 }
 
 int main(int argc, char **argv) {
